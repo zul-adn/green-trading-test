@@ -10,6 +10,10 @@ type Shirt = {
   price: number
 }
 
+type DiscountGrouping = {
+  [key: string]: Shirt[]
+}
+
 const tshirtCollection: Shirt[] = [
   {
     id: uuidv4(),
@@ -60,32 +64,78 @@ const discountRule = [
 const Index = () => {
 
   const [cart, setCart] = React.useState<Shirt[]>([]);
+  const [discountGroup, setDiscountGroup] = React.useState<DiscountGrouping>({})
   const [grandTotal, setGrandTotal] = React.useState<number>(0);
+  const [grandTotalAfterDiscount, setGrandTotalAfterDiscount] = React.useState<number>(0);
   const [discount, setDiscount] = React.useState<number>(0);
 
   const addToCart = (shirt: Shirt) => {
     const newCart: Shirt[] = [...cart];
     newCart.push(shirt);
     setCart(newCart);
+    cartGrouping(shirt);
+    setGrandTotal(grandTotal + shirt.price)
   }
 
-  const cartGrouping = () => {
-    const group = cart.reduce((v: any, i) => {
-      v[i.name] = [...v[i.name] || [], i];
-      return v;
-    }, {})
+  const cartGrouping = (item: Shirt) => {
 
-    const discountCollection = Object.keys(group).length
+    let newGroup = {...discountGroup}
+    let key
 
-    for(let i = 0; i<discountRule.length; i++){
-      console.log(discountCollection)
-      if(discountCollection === discountRule[i].collection){
-        setDiscount(discountRule[i].discount)
-        return
-      }else{
-        setDiscount(0)
+    if (Object.keys(discountGroup).length === 0) {
+      key = "group1";
+      newGroup = { [key]: [item] }
+      setDiscountGroup(newGroup)
+    } else {
+      for (let i = 1; i <= Object.keys(discountGroup).length; i++) {
+        console.log(i)
+        const check = discountGroup[`group${i}`].some(v => v.name === item.name);
+        if (check) {
+          console.log("true")
+          key = `group${Object.keys(discountGroup).length+1}`;
+          newGroup = { [key]: [item] }
+          setDiscountGroup({...discountGroup, ...newGroup})
+        } else {
+          discountGroup[`group${i}`].push(item)
+        }
       }
     }
+
+    console.log(discountGroup)
+    console.log(Object.keys(discountGroup).length)
+
+    // const group = cart.reduce((v: any, i) => {
+    //   [i.name] = [...v[i.name] || [], i];
+    //   return v;
+    // }, {})
+
+    // const discountCollection = Object.keys(group).length
+
+    // for(let i = 0; i<discountRule.length; i++){
+    //   console.log(discountCollection)
+    //   if(discountCollection === discountRule[i].collection){
+    //     setDiscount(discountRule[i].discount)
+    //     calcGrandTotalAfterDiscount(discountCollection)
+    //     return
+    //   }else{
+    //     setDiscount(0)
+    //   }
+    // }
+  }
+
+  const calcGrandTotalAfterDiscount = (total: number) => {
+    let calculte
+    console.log(cart.length === total)
+    if (total === cart.length) {
+      calculte = grandTotal - (grandTotal * discount / 100)
+    } else {
+      const otherShirt = cart.length - total;
+      const otherShirtPrice = otherShirt * 8;
+      console.log(otherShirtPrice)
+      calculte = grandTotal - (grandTotal * discount / 100)
+    }
+
+    setGrandTotalAfterDiscount(calculte)
   }
 
 
@@ -95,11 +145,11 @@ const Index = () => {
       <div className="mt-10 w-full bg-violet-800 rounded px-2 py-3 text-white flex justify-between">
         {cart.length}
 
-        <div onClick={cartGrouping}>Calculate Discount</div>
+        {/* <div onClick={cartGrouping}>Calculate Discount</div> */}
 
       </div>
       <div id="card-container" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-8 gap-4 mt-10">
-        
+
         {tshirtCollection.map((v, i) =>
           <div key={i} onClick={() => addToCart(v)} className="border border-violet-400 shadow rounded-md p-1 w-full mx-auto cursor-pointer hover:bg-violet-200">
             <div className="flex flex-col">
@@ -118,13 +168,15 @@ const Index = () => {
       </div>
 
       <div>
-        Real Price {cart.length ? cart.map(v => v.price).reduce((prev, next) => {return prev+next}) : 0}
+        {/* Real Price {cart.length ? cart.map(v => v.price).reduce((prev, next) => {return prev+next}) : 0} */}
+        Grand Total {grandTotal}
       </div>
       <div>
-        Discount {discount}
+        Discount {discount} % / $ {grandTotal * discount / 100}
       </div>
+
       <div>
-        Total After Discount {discount}
+        Total After Discount $ {grandTotalAfterDiscount} / {grandTotal - (grandTotal * discount / 100) + 24}
       </div>
 
     </div>
