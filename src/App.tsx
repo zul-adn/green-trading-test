@@ -64,10 +64,11 @@ const discountRule = [
 const Index = () => {
 
   const [cart, setCart] = React.useState<Shirt[]>([]);
-  const [discountGroup, setDiscountGroup] = React.useState<DiscountGrouping>({})
+  const [discountGroup, setDiscountGroup] = React.useState<DiscountGrouping>({});
+  const [shirtNoDiscount, setShirtNoDiscount] = React.useState<number>(0)
   const [grandTotal, setGrandTotal] = React.useState<number>(0);
-  const [grandTotalAfterDiscount, setGrandTotalAfterDiscount] = React.useState<number>(0);
-  const [discount, setDiscount] = React.useState<number>(0);
+  const [totalAfterDiscount, setTotalAfterDiscount] = React.useState<number[]>([]);
+  const [discount, setDiscount] = React.useState<number[]>([]);
 
   const addToCart = (shirt: Shirt) => {
     const newCart: Shirt[] = [...cart];
@@ -79,7 +80,7 @@ const Index = () => {
 
   const cartGrouping = (item: Shirt) => {
 
-    let newGroup = {...discountGroup}
+    let newGroup = { ...discountGroup }
     let key
 
     if (Object.keys(discountGroup).length === 0) {
@@ -88,65 +89,61 @@ const Index = () => {
       setDiscountGroup(newGroup)
     } else {
       for (let i = 1; i <= Object.keys(discountGroup).length; i++) {
-        console.log(i)
         const check = discountGroup[`group${i}`].some(v => v.name === item.name);
         if (check) {
-          console.log("true")
-          key = `group${Object.keys(discountGroup).length+1}`;
+          key = `group${Object.keys(discountGroup).length + 1}`;
           newGroup = { [key]: [item] }
-          setDiscountGroup({...discountGroup, ...newGroup})
+          setDiscountGroup({ ...discountGroup, ...newGroup })
+          return
         } else {
           discountGroup[`group${i}`].push(item)
+          // return
         }
       }
     }
 
-    console.log(discountGroup)
-    console.log(Object.keys(discountGroup).length)
-
-    // const group = cart.reduce((v: any, i) => {
-    //   [i.name] = [...v[i.name] || [], i];
-    //   return v;
-    // }, {})
-
-    // const discountCollection = Object.keys(group).length
-
-    // for(let i = 0; i<discountRule.length; i++){
-    //   console.log(discountCollection)
-    //   if(discountCollection === discountRule[i].collection){
-    //     setDiscount(discountRule[i].discount)
-    //     calcGrandTotalAfterDiscount(discountCollection)
-    //     return
-    //   }else{
-    //     setDiscount(0)
-    //   }
-    // }
   }
 
-  const calcGrandTotalAfterDiscount = (total: number) => {
-    let calculte
-    console.log(cart.length === total)
-    if (total === cart.length) {
-      calculte = grandTotal - (grandTotal * discount / 100)
-    } else {
-      const otherShirt = cart.length - total;
-      const otherShirtPrice = otherShirt * 8;
-      console.log(otherShirtPrice)
-      calculte = grandTotal - (grandTotal * discount / 100)
+  const calculateDiscount = () => {
+    let newDiscount
+
+    console.log(discountGroup)
+    for (let i = 0; i < Object.keys(discountGroup).length; i++) {
+      //console.log(discountGroup[`group${i+1}`].length)
+      if (discountGroup[`group${i + 1}`].length > 1) {
+        const length = discountGroup[`group${i + 1}`].length
+        console.log(length)
+        for (let j = 0; j < discountRule.length; j++) {
+          // console.log(`${length} === ${discountRule[j].collection}`)
+          if (length === discountRule[j].collection) {
+            console.log(`${length} === ${discountRule[j].collection} => same`)
+            calculateGrandTotal(discountRule[j].discount, length)
+          }
+        }
+      } else {
+        setShirtNoDiscount(shirtNoDiscount + 1)
+      }
     }
 
-    setGrandTotalAfterDiscount(calculte)
+    console.log(discount)
   }
 
+  const calculateGrandTotal = (discountTotal:number, totalItem:number) => {
+    let newPrice
+    newPrice = [...totalAfterDiscount]
+    const newPriceAfterDiscount = totalItem * (8 - (discountTotal/100 * 8))
+    newPrice.push(newPriceAfterDiscount)
+    setTotalAfterDiscount(newPrice)
+    console.log(newPriceAfterDiscount)
+    console.log(totalAfterDiscount)
+  }
 
   return (
     <div className="h-full px-40">
 
-      <div className="mt-10 w-full bg-violet-800 rounded px-2 py-3 text-white flex justify-between">
-        {cart.length}
-
-        {/* <div onClick={cartGrouping}>Calculate Discount</div> */}
-
+      <div className="mt-10 w-full bg-violet-800 rounded px-2 py-2 text-white flex justify-between">
+        Shoping Cart {cart.length}
+        <div onClick={calculateDiscount} className="px-2 bg-violet-900 py-2 rounded cursor-pointer hover:bg-violet-800">Calculate Discount</div>
       </div>
       <div id="card-container" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-8 gap-4 mt-10">
 
@@ -160,7 +157,7 @@ const Index = () => {
               </div>
               <div className="flex-1 py-2 px-2">
                 <div className="text-lg font-bold text-lg truncate">{v.name}</div>
-                <div className="text-sm truncate">{v.price}</div>
+                <div className="text-sm truncate">$ {v.price}</div>
               </div>
             </div>
           </div>
@@ -169,14 +166,18 @@ const Index = () => {
 
       <div>
         {/* Real Price {cart.length ? cart.map(v => v.price).reduce((prev, next) => {return prev+next}) : 0} */}
-        Grand Total {grandTotal}
+        No Discount {shirtNoDiscount} pcs
       </div>
       <div>
-        Discount {discount} % / $ {grandTotal * discount / 100}
+        {/* Discount {discount} % / $ {grandTotal * discount / 100} */}
       </div>
 
       <div>
-        Total After Discount $ {grandTotalAfterDiscount} / {grandTotal - (grandTotal * discount / 100) + 24}
+        {/* Total After Discount $ {grandTotalAfterDiscount} / {grandTotal - (grandTotal * discount / 100) + 24} */}
+      </div>
+      <div>
+       After Discount Price $ {totalAfterDiscount.length ? totalAfterDiscount.map(v => v).reduce((prev, next) => {return prev+next}) : 0}
+          {totalAfterDiscount.map((v) => <p>{v}</p>)}
       </div>
 
     </div>
