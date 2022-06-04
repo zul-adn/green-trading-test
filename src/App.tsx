@@ -40,34 +40,38 @@ const tshirtCollection: Shirt[] = [
 
 const Index = () => {
 
-  const addToCart = () => {
+  const [cart, setCart] = React.useState<Shirt[]>([])
 
+  const addToCart = (shirt: Shirt) => {
+    const newCart: Shirt[] = [...cart];
+    newCart.push(shirt);
+    setCart(newCart);
   }
+
 
   return (
     <div className="h-full px-40">
 
-      <div className="mt-10 w-full bg-violet-800 rounded px-2 py-3">
-        tes
+      <div className="mt-10 w-full bg-violet-800 rounded px-2 py-3 text-white">
+        {cart.length}
       </div>
-
       <div id="card-container" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-8 gap-4 mt-10">
-
-        <div className="border border-violet-400 shadow rounded-md p-1 w-full mx-auto cursor-pointer hover:bg-violet-200">
-
-          <div className="flex flex-col">
-            <div className="rounded bg-teal-400 aspect-square w-full">
-              <img
-                src="https://www.static-src.com/wcsstore/Indraprastha/images/catalog/medium//98/MTA-41593057/no_brand_kemeja_flanel_pria_lengan_panjang_kemeja_flanel_full01_ptqfwjp.jpg"
-                className="rounded" />
-            </div>
-            <div className="flex-1 py-2 px-2">
-              {/* <div className="text-lg font-bold text-lg truncate">{v.strMeal}</div>
-              <div className="text-sm truncate">{v.strTags}</div> */}
+        
+        {tshirtCollection.map((v, i) =>
+          <div key={i} onClick={() => addToCart(v)} className="border border-violet-400 shadow rounded-md p-1 w-full mx-auto cursor-pointer hover:bg-violet-200">
+            <div className="flex flex-col">
+              <div className="rounded bg-teal-400 aspect-square w-full">
+                <img
+                  src="https://www.static-src.com/wcsstore/Indraprastha/images/catalog/medium//98/MTA-41593057/no_brand_kemeja_flanel_pria_lengan_panjang_kemeja_flanel_full01_ptqfwjp.jpg"
+                  className="rounded" />
+              </div>
+              <div className="flex-1 py-2 px-2">
+                <div className="text-lg font-bold text-lg truncate">{v.name}</div>
+                <div className="text-sm truncate">{v.price}</div>
+              </div>
             </div>
           </div>
-        </div>
-
+        )}
       </div>
 
     </div>
