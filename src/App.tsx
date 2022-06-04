@@ -38,9 +38,30 @@ const tshirtCollection: Shirt[] = [
   },
 ]
 
+const discountRule = [
+  {
+    collection: 2,
+    discount: 5
+  },
+  {
+    collection: 3,
+    discount: 10
+  },
+  {
+    collection: 4,
+    discount: 20
+  },
+  {
+    collection: 5,
+    discount: 25
+  },
+]
+
 const Index = () => {
 
-  const [cart, setCart] = React.useState<Shirt[]>([])
+  const [cart, setCart] = React.useState<Shirt[]>([]);
+  const [grandTotal, setGrandTotal] = React.useState<number>(0);
+  const [discount, setDiscount] = React.useState<number>(0);
 
   const addToCart = (shirt: Shirt) => {
     const newCart: Shirt[] = [...cart];
@@ -48,12 +69,34 @@ const Index = () => {
     setCart(newCart);
   }
 
+  const cartGrouping = () => {
+    const group = cart.reduce((v: any, i) => {
+      v[i.name] = [...v[i.name] || [], i];
+      return v;
+    }, {})
+
+    const discountCollection = Object.keys(group).length
+
+    for(let i = 0; i<discountRule.length; i++){
+      console.log(discountCollection)
+      if(discountCollection === discountRule[i].collection){
+        setDiscount(discountRule[i].discount)
+        return
+      }else{
+        setDiscount(0)
+      }
+    }
+  }
+
 
   return (
     <div className="h-full px-40">
 
-      <div className="mt-10 w-full bg-violet-800 rounded px-2 py-3 text-white">
+      <div className="mt-10 w-full bg-violet-800 rounded px-2 py-3 text-white flex justify-between">
         {cart.length}
+
+        <div onClick={cartGrouping}>Calculate Discount</div>
+
       </div>
       <div id="card-container" className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-8 gap-4 mt-10">
         
@@ -72,6 +115,16 @@ const Index = () => {
             </div>
           </div>
         )}
+      </div>
+
+      <div>
+        Real Price {cart.length ? cart.map(v => v.price).reduce((prev, next) => {return prev+next}) : 0}
+      </div>
+      <div>
+        Discount {discount}
+      </div>
+      <div>
+        Total After Discount {discount}
       </div>
 
     </div>
