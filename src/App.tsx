@@ -49,7 +49,7 @@ const Index = () => {
           let newArr2 = [...discountGroup[`group${i}`]]
           newArr2.push(item)
           key = `group${i}`;
-          newGroup =  { [key]: newArr2 }
+          newGroup = { [key]: newArr2 }
           setDiscountGroup({ ...discountGroup, ...newGroup })
           return
         }
@@ -79,16 +79,16 @@ const Index = () => {
   }
 
   const calculateGrandTotal = (discountTotal: number, totalItem: number) => {
-    
+
     const newPriceAfterDiscount = totalItem * (8 - (discountTotal / 100 * 8))
     return newPriceAfterDiscount
-    
+
   }
 
   return (
     <div className="h-full px-40">
 
-      <div className="mt-10 w-full bg-violet-800 rounded px-2 py-2 text-white flex justify-between">
+      <div className="mt-10 w-full bg-violet-800 rounded px-2 py-2 text-white flex justify-between items-center ">
         Shoping Cart {cart.length}
         <div onClick={calculateDiscount} className="px-2 bg-violet-900 py-2 rounded cursor-pointer hover:bg-violet-800">Calculate Discount</div>
       </div>
@@ -104,20 +104,21 @@ const Index = () => {
               </div>
               <div className="flex-1 py-2 px-2">
                 <div className="text-lg font-bold text-lg truncate">{v.name}</div>
-                <div className="text-sm truncate">$ {v.price}</div>
+                <div className="text-sm font-bold truncate">$ {v.price}</div>
               </div>
             </div>
           </div>
         )}
       </div>
 
-      <div>
-        No Discount {shirtNoDiscount} pcs
+      <div className="mt-10 w-full bg-violet-800 rounded px-2 py-2 text-white flex justify-between">
+        <div>
+          Total <span className="text-lg font-bold"> $ {grandTotal}</span>
+        </div>
+        <div className={``}>
+          After Discount Price <span className="text-lg font-bold"> $ {totalAfterDiscount.length ? totalAfterDiscount.reduce((prev, next) => prev + next) : 0} </span>
+        </div>
       </div>
-      <div>
-        After Discount Price $ {totalAfterDiscount.length ? totalAfterDiscount.reduce((prev,next) => prev + next ) : 0}
-      </div>
-
     </div>
 
   )
