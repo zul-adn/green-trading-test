@@ -1,65 +1,16 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
-import { v4 as uuidv4 } from 'uuid';
 
-type Shirt = {
-  id: string,
-  name: string,
-  // thumbnail: string,
-  price: number
-}
+import {
+  tshirtCollection,
+  discountRule
+} from './mock/datas';
 
-type DiscountGrouping = {
-  [key: string]: Shirt[]
-}
+import {
+  Shirt,
+  DiscountGrouping
+} from './type/type';
 
-const tshirtCollection: Shirt[] = [
-  {
-    id: uuidv4(),
-    name: "Collection 1",
-    price: 8
-  },
-  {
-    id: uuidv4(),
-    name: "Collection 2",
-    price: 8
-  },
-  {
-    id: uuidv4(),
-    name: "Collection 3",
-    price: 8
-  },
-  {
-    id: uuidv4(),
-    name: "Collection 4",
-    price: 8
-  },
-  {
-    id: uuidv4(),
-    name: "Collection 5",
-    price: 8
-  },
-]
-
-const discountRule = [
-  {
-    collection: 2,
-    discount: 5
-  },
-  {
-    collection: 3,
-    discount: 10
-  },
-  {
-    collection: 4,
-    discount: 20
-  },
-  {
-    collection: 5,
-    discount: 25
-  },
-]
 
 const Index = () => {
 
@@ -68,7 +19,6 @@ const Index = () => {
   const [shirtNoDiscount, setShirtNoDiscount] = React.useState<number>(0)
   const [grandTotal, setGrandTotal] = React.useState<number>(0);
   const [totalAfterDiscount, setTotalAfterDiscount] = React.useState<number[]>([]);
-  const [discount, setDiscount] = React.useState<number[]>([]);
 
   const addToCart = (shirt: Shirt) => {
     const newCart: Shirt[] = [...cart];
@@ -149,7 +99,7 @@ const Index = () => {
             <div className="flex flex-col">
               <div className="rounded bg-teal-400 aspect-square w-full">
                 <img
-                  src="https://www.static-src.com/wcsstore/Indraprastha/images/catalog/medium//98/MTA-41593057/no_brand_kemeja_flanel_pria_lengan_panjang_kemeja_flanel_full01_ptqfwjp.jpg"
+                  src={v.thumbnail}
                   className="rounded" />
               </div>
               <div className="flex-1 py-2 px-2">
