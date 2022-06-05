@@ -91,17 +91,20 @@ const Index = () => {
       for (let i = 1; i <= Object.keys(discountGroup).length; i++) {
         const check = discountGroup[`group${i}`].some(v => v.name === item.name);
         if (check) {
-          key = `group${Object.keys(discountGroup).length + 1}`;
+          key = `group${i + 1}`;
+          console.log(key)
           newGroup = { [key]: [item] }
           setDiscountGroup({ ...discountGroup, ...newGroup })
-          return
         } else {
-          discountGroup[`group${i}`].push(item)
-          // return
+          let newArr2 = [...discountGroup[`group${i}`]]
+          newArr2.push(item)
+          key = `group${i}`;
+          newGroup =  { [key]: newArr2 }
+          setDiscountGroup({ ...discountGroup, ...newGroup })
+          return
         }
       }
     }
-
   }
 
   const calculateDiscount = () => {
@@ -109,12 +112,9 @@ const Index = () => {
 
     console.log(discountGroup)
     for (let i = 0; i < Object.keys(discountGroup).length; i++) {
-      //console.log(discountGroup[`group${i+1}`].length)
-      if (discountGroup[`group${i + 1}`].length > 1) {
+      if (discountGroup[`group${i + 1}`].length > 0) {
         const length = discountGroup[`group${i + 1}`].length
-        console.log(length)
         for (let j = 0; j < discountRule.length; j++) {
-          // console.log(`${length} === ${discountRule[j].collection}`)
           if (length === discountRule[j].collection) {
             console.log(`${length} === ${discountRule[j].collection} => same`)
             calculateGrandTotal(discountRule[j].discount, length)
@@ -128,14 +128,14 @@ const Index = () => {
     console.log(discount)
   }
 
-  const calculateGrandTotal = (discountTotal:number, totalItem:number) => {
+  const calculateGrandTotal = (discountTotal: number, totalItem: number) => {
     let newPrice
     newPrice = [...totalAfterDiscount]
-    const newPriceAfterDiscount = totalItem * (8 - (discountTotal/100 * 8))
+    const newPriceAfterDiscount = totalItem * (8 - (discountTotal / 100 * 8))
     newPrice.push(newPriceAfterDiscount)
     setTotalAfterDiscount(newPrice)
+    console.log(newPrice)
     console.log(newPriceAfterDiscount)
-    console.log(totalAfterDiscount)
   }
 
   return (
@@ -165,21 +165,13 @@ const Index = () => {
       </div>
 
       <div>
-        {/* Real Price {cart.length ? cart.map(v => v.price).reduce((prev, next) => {return prev+next}) : 0} */}
         No Discount {shirtNoDiscount} pcs
       </div>
       <div>
-        {/* Discount {discount} % / $ {grandTotal * discount / 100} */}
-      </div>
+        After Discount Price $ {totalAfterDiscount.length ? totalAfterDiscount.map(v => v).reduce((prev, next) => { return prev + next }) : 0}
 
-      <div>
-        {/* Total After Discount $ {grandTotalAfterDiscount} / {grandTotal - (grandTotal * discount / 100) + 24} */}
       </div>
-      <div>
-       After Discount Price $ {totalAfterDiscount.length ? totalAfterDiscount.map(v => v).reduce((prev, next) => {return prev+next}) : 0}
-          {totalAfterDiscount.map((v) => <p>{v}</p>)}
-      </div>
-
+          {totalAfterDiscount.map((v) => v)}
     </div>
 
   )
