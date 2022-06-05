@@ -89,8 +89,8 @@ const Index = () => {
       setDiscountGroup(newGroup)
     } else {
       for (let i = 1; i <= Object.keys(discountGroup).length; i++) {
-        const check = discountGroup[`group${i}`].some(v => v.name === item.name);
-        if (check) {
+        const checkIfExist = discountGroup[`group${i}`].some(v => v.name === item.name);
+        if (checkIfExist) {
           key = `group${i + 1}`;
           console.log(key)
           newGroup = { [key]: [item] }
@@ -108,34 +108,31 @@ const Index = () => {
   }
 
   const calculateDiscount = () => {
-    let newDiscount
 
-    console.log(discountGroup)
+    const newGrandTotal = [...totalAfterDiscount]
+
     for (let i = 0; i < Object.keys(discountGroup).length; i++) {
       if (discountGroup[`group${i + 1}`].length > 0) {
         const length = discountGroup[`group${i + 1}`].length
         for (let j = 0; j < discountRule.length; j++) {
           if (length === discountRule[j].collection) {
             console.log(`${length} === ${discountRule[j].collection} => same`)
-            calculateGrandTotal(discountRule[j].discount, length)
+            const calculateDisc = calculateGrandTotal(discountRule[j].discount, length)
+            newGrandTotal.push(calculateDisc)
+            setTotalAfterDiscount(newGrandTotal)
           }
         }
       } else {
         setShirtNoDiscount(shirtNoDiscount + 1)
       }
     }
-
-    console.log(discount)
   }
 
   const calculateGrandTotal = (discountTotal: number, totalItem: number) => {
-    let newPrice
-    newPrice = [...totalAfterDiscount]
+    
     const newPriceAfterDiscount = totalItem * (8 - (discountTotal / 100 * 8))
-    newPrice.push(newPriceAfterDiscount)
-    setTotalAfterDiscount(newPrice)
-    console.log(newPrice)
-    console.log(newPriceAfterDiscount)
+    return newPriceAfterDiscount
+    
   }
 
   return (
@@ -168,10 +165,9 @@ const Index = () => {
         No Discount {shirtNoDiscount} pcs
       </div>
       <div>
-        After Discount Price $ {totalAfterDiscount.length ? totalAfterDiscount.map(v => v).reduce((prev, next) => { return prev + next }) : 0}
-
+        After Discount Price $ {totalAfterDiscount.length ? totalAfterDiscount.reduce((prev,next) => prev + next ) : 0}
       </div>
-          {totalAfterDiscount.map((v) => v)}
+
     </div>
 
   )
